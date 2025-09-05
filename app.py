@@ -118,26 +118,39 @@ def improvement_suggestions():
             return jsonify({"suggestions": ["No reviews available to analyze."]})
 
         prompt = f"""
+        You are an AI that outputs ONLY JSON.
         Based on the following customer feedback, suggest actionable steps to improve the service.
+
         Problems reported: {problems}
         Good points mentioned: {good_points}
 
-        Return STRICT JSON with:
-        suggestions: an array of 3–5 concrete improvement actions.
+        Return STRICT JSON in this format:
+        {{
+          "suggestions": ["...", "...", "..."]
+        }}
         """
 
         resp = client.responses.create(
             model="gpt-4o",
             input=prompt,
-            temperature=0
+            temperature=0,
+            max_tokens=300
         )
 
         result_text = resp.output_text.strip()
         clean_text = re.sub(r"^```json\s*|\s*```$", "", result_text, flags=re.MULTILINE)
-        result = json.loads(clean_text)
+
+        try:
+            result = json.loads(clean_text)
+        except json.JSONDecodeError:
+            return jsonify({
+                "suggestions": ["Could not parse AI suggestions, please try again later."]
+            })
+
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == '__main__':
