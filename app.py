@@ -90,8 +90,7 @@ def summarize_reviews():
         resp = client.responses.create(
             model="gpt-4o",
             input=prompt,
-            temperature=0,
-            max_tokens=300  # Limit response size
+            temperature=0
         )
 
         result_text = resp.output_text.strip()
@@ -137,8 +136,7 @@ def improvement_suggestions():
         resp = client.responses.create(
             model="gpt-4o",
             input=prompt,
-            temperature=0,
-            max_tokens=300
+            temperature=0
         )
 
         result_text = resp.output_text.strip()
