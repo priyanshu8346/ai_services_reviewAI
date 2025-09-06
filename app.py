@@ -142,18 +142,25 @@ def improvement_suggestions():
         )
 
         result_text = resp.output_text.strip()
+        print("[/suggestions] Raw AI response:", result_text)  # 👈 log AI output
+
         clean_text = re.sub(r"^```json\s*|\s*```$", "", result_text, flags=re.MULTILINE)
 
         try:
             result = json.loads(clean_text)
-        except json.JSONDecodeError:
+            return jsonify(result)
+        except json.JSONDecodeError as e:
+            print("[/suggestions] JSON decode error:", str(e))
             return jsonify({
-                "suggestions": ["Could not parse AI suggestions, please try again later."]
+                "suggestions": ["Suggestions are not available at this moment."]
             })
 
-        return jsonify(result)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("[/suggestions] Fatal error:", str(e))  # 👈 log fatal errors
+        return jsonify({
+            "suggestions": ["Suggestions are not available at this moment."]
+        }), 200  # 👈 don’t send 500, send safe fallback
+
 
 
 
