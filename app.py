@@ -10,6 +10,10 @@ load_dotenv()
 app = Flask(__name__)
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({"status": "ok", "message": "AI Service running"}), 200
+
 @app.route('/analyze', methods=['POST'])
 def analyze_review():
     try:
